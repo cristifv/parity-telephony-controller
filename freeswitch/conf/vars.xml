@@ -1,0 +1,11 @@
+<include>
+  <!-- Production values. The ESL password comes from a secret file the deploy role mounts
+       (step 8); it is never committed. -->
+  <X-PRE-PROCESS cmd="exec-set" data="esl_password=cat /run/secrets/freeswitch_esl_password"/>
+  <X-PRE-PROCESS cmd="set" data="sip_ip=127.0.0.1"/>
+  <!-- Only the test overlay sets this true: the dialplan then takes a leg id from X-Test-Leg-ID. -->
+  <X-PRE-PROCESS cmd="set" data="tc_test_headers=false"/>
+  <X-PRE-PROCESS cmd="set" data="carrier_session_timeout=1800"/>
+  <X-PRE-PROCESS cmd="set" data="deskphone_session_timeout=1800"/>
+  <X-PRE-PROCESS cmd="set" data="json_cdr_dir=/var/log/freeswitch/json_cdr"/>
+</include>

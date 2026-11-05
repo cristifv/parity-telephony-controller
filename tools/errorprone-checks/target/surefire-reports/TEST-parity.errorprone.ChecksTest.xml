@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="parity.errorprone.ChecksTest" time="0.771" tests="6" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/cristifg/Repos/parity-contact-center/parity-admin-console/../parity-telephony-controller/tools/errorprone-checks/target/test-classes:/home/cristifg/Repos/parity-contact-center/parity-admin-console/../parity-telephony-controller/tools/errorprone-checks/target/classes:/home/cristifg/.m2/repository/com/google/errorprone/error_prone_check_api/2.50.0/error_prone_check_api-2.50.0.jar:/home/cristifg/.m2/repository/com/google/errorprone/error_prone_annotation/2.50.0/error_prone_annotation-2.50.0.jar:/home/cristifg/.m2/repository/com/google/guava/guava/33.5.0-jre/guava-33.5.0-jre.jar:/home/cristifg/.m2/repository/com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar:/home/cristifg/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/cristifg/.m2/repository/com/google/j2objc/j2objc-annotations/3.1/j2objc-annotations-3.1.jar:/home/cristifg/.m2/repository/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar:/home/cristifg/.m2/repository/io/github/eisop/dataflow-errorprone/3.41.0-eisop1/dataflow-errorprone-3.41.0-eisop1.jar:/home/cristifg/.m2/repository/io/github/java-diff-utils/java-diff-utils/4.12/java-diff-utils-4.12.jar:/home/cristifg/.m2/repository/com/google/auto/value/auto-value-annotations/1.9/auto-value-annotations-1.9.jar:/home/cristifg/.m2/repository/com/github/kevinstern/software-and-algorithms/1.0/software-and-algorithms-1.0.jar:/home/cristifg/.m2/repository/com/github/ben-manes/caffeine/caffeine/3.0.5/caffeine-3.0.5.jar:/home/cristifg/.m2/repository/org/checkerframework/checker-qual/3.19.0/checker-qual-3.19.0.jar:/home/cristifg/.m2/repository/javax/inject/javax.inject/1/javax.inject-1.jar:/home/cristifg/.m2/repository/com/google/errorprone/error_prone_test_helpers/2.50.0/error_prone_test_helpers-2.50.0.jar:/home/cristifg/.m2/repository/com/google/googlejavaformat/google-java-format/1.35.0/google-java-format-1.35.0.jar:/home/cristifg/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/home/cristifg/.m2/repository/org/hamcrest/hamcrest-core/2.2/hamcrest-core-2.2.jar:/home/cristifg/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/home/cristifg/.m2/repository/org/hamcrest/hamcrest-library/2.2/hamcrest-library-2.2.jar:/home/cristifg/.m2/repository/com/google/truth/truth/1.4.0/truth-1.4.0.jar:/home/cristifg/.m2/repository/org/ow2/asm/asm/9.6/asm-9.6.jar:/home/cristifg/.m2/repository/com/google/jimfs/jimfs/1.3.0/jimfs-1.3.0.jar:/home/cristifg/.m2/repository/com/google/testing/compile/compile-testing/0.23.0/compile-testing-0.23.0.jar:/home/cristifg/.m2/repository/com/google/auto/auto-common/1.2.2/auto-common-1.2.2.jar:/home/cristifg/.m2/repository/org/junit/jupiter/junit-jupiter/5.13.4/junit-jupiter-5.13.4.jar:/home/cristifg/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.13.4/junit-jupiter-api-5.13.4.jar:/home/cristifg/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/cristifg/.m2/repository/org/junit/platform/junit-platform-commons/1.13.4/junit-platform-commons-1.13.4.jar:/home/cristifg/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/cristifg/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.13.4/junit-jupiter-params-5.13.4.jar:/home/cristifg/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.13.4/junit-jupiter-engine-5.13.4.jar:/home/cristifg/.m2/repository/org/junit/platform/junit-platform-engine/1.13.4/junit-platform-engine-1.13.4.jar:/home/cristifg/.m2/repository/com/google/errorprone/error_prone_annotations/2.50.0/error_prone_annotations-2.50.0.jar:/home/cristifg/.m2/repository/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar:/home/cristifg/.m2/repository/com/google/protobuf/protobuf-java/4.35.1/protobuf-java-4.35.1.jar:"/>
+    <property name="java.vm.vendor" value="Amazon.com Inc."/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://aws.amazon.com/corretto/"/>
+    <property name="user.timezone" value="Europe/Bucharest"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="/home/cristifg/.sdkman/candidates/java/21.0.10-amzn/lib"/>
+    <property name="sun.java.command" value="/home/cristifg/Repos/parity-contact-center/parity-telephony-controller/tools/errorprone-checks/target/surefire/surefirebooter-20261103115522942_3.jar /home/cristifg/Repos/parity-contact-center/parity-telephony-controller/tools/errorprone-checks/target/surefire 2026-11-03T11-55-22_875-jvmRun1 surefire-20261103115522942_1tmp surefire_0-20261103115522942_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/home/cristifg/Repos/parity-contact-center/parity-admin-console/../parity-telephony-controller/tools/errorprone-checks/target/test-classes:/home/cristifg/Repos/parity-contact-center/parity-admin-console/../parity-telephony-controller/tools/errorprone-checks/target/classes:/home/cristifg/.m2/repository/com/google/errorprone/error_prone_check_api/2.50.0/error_prone_check_api-2.50.0.jar:/home/cristifg/.m2/repository/com/google/errorprone/error_prone_annotation/2.50.0/error_prone_annotation-2.50.0.jar:/home/cristifg/.m2/repository/com/google/guava/guava/33.5.0-jre/guava-33.5.0-jre.jar:/home/cristifg/.m2/repository/com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar:/home/cristifg/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/cristifg/.m2/repository/com/google/j2objc/j2objc-annotations/3.1/j2objc-annotations-3.1.jar:/home/cristifg/.m2/repository/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar:/home/cristifg/.m2/repository/io/github/eisop/dataflow-errorprone/3.41.0-eisop1/dataflow-errorprone-3.41.0-eisop1.jar:/home/cristifg/.m2/repository/io/github/java-diff-utils/java-diff-utils/4.12/java-diff-utils-4.12.jar:/home/cristifg/.m2/repository/com/google/auto/value/auto-value-annotations/1.9/auto-value-annotations-1.9.jar:/home/cristifg/.m2/repository/com/github/kevinstern/software-and-algorithms/1.0/software-and-algorithms-1.0.jar:/home/cristifg/.m2/repository/com/github/ben-manes/caffeine/caffeine/3.0.5/caffeine-3.0.5.jar:/home/cristifg/.m2/repository/org/checkerframework/checker-qual/3.19.0/checker-qual-3.19.0.jar:/home/cristifg/.m2/repository/javax/inject/javax.inject/1/javax.inject-1.jar:/home/cristifg/.m2/repository/com/google/errorprone/error_prone_test_helpers/2.50.0/error_prone_test_helpers-2.50.0.jar:/home/cristifg/.m2/repository/com/google/googlejavaformat/google-java-format/1.35.0/google-java-format-1.35.0.jar:/home/cristifg/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/home/cristifg/.m2/repository/org/hamcrest/hamcrest-core/2.2/hamcrest-core-2.2.jar:/home/cristifg/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/home/cristifg/.m2/repository/org/hamcrest/hamcrest-library/2.2/hamcrest-library-2.2.jar:/home/cristifg/.m2/repository/com/google/truth/truth/1.4.0/truth-1.4.0.jar:/home/cristifg/.m2/repository/org/ow2/asm/asm/9.6/asm-9.6.jar:/home/cristifg/.m2/repository/com/google/jimfs/jimfs/1.3.0/jimfs-1.3.0.jar:/home/cristifg/.m2/repository/com/google/testing/compile/compile-testing/0.23.0/compile-testing-0.23.0.jar:/home/cristifg/.m2/repository/com/google/auto/auto-common/1.2.2/auto-common-1.2.2.jar:/home/cristifg/.m2/repository/org/junit/jupiter/junit-jupiter/5.13.4/junit-jupiter-5.13.4.jar:/home/cristifg/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.13.4/junit-jupiter-api-5.13.4.jar:/home/cristifg/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/cristifg/.m2/repository/org/junit/platform/junit-platform-commons/1.13.4/junit-platform-commons-1.13.4.jar:/home/cristifg/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/cristifg/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.13.4/junit-jupiter-params-5.13.4.jar:/home/cristifg/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.13.4/junit-jupiter-engine-5.13.4.jar:/home/cristifg/.m2/repository/org/junit/platform/junit-platform-engine/1.13.4/junit-platform-engine-1.13.4.jar:/home/cristifg/.m2/repository/com/google/errorprone/error_prone_annotations/2.50.0/error_prone_annotations-2.50.0.jar:/home/cristifg/.m2/repository/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar:/home/cristifg/.m2/repository/com/google/protobuf/protobuf-java/4.35.1/protobuf-java-4.35.1.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/cristifg"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-01-20"/>
+    <property name="java.home" value="/home/cristifg/.sdkman/candidates/java/21.0.10-amzn"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/cristifg/Repos/parity-contact-center/parity-admin-console/../parity-telephony-controller/tools/errorprone-checks"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="/home/cristifg/Repos/parity-contact-center/parity-telephony-controller/tools/errorprone-checks/target/surefire/surefirebooter-20261103115522942_3.jar"/>
+    <property name="java.protocol.handler.pkgs" value="com.google.common"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.10+7-LTS"/>
+    <property name="user.name" value="cristifg"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.17.1-300.fc43.x86_64"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Corretto-21.0.10.7.1"/>
+    <property name="localRepository" value="/home/cristifg/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/corretto/corretto-21/issues/"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="21.0.10"/>
+    <property name="user.dir" value="/home/cristifg/Repos/parity-contact-center/parity-telephony-controller/tools/errorprone-checks"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Amazon.com Inc."/>
+    <property name="java.vm.version" value="21.0.10+7-LTS"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+  </properties>
+  <testcase name="aProtobufMessageIsNeverConcatenatedOrLogged" classname="parity.errorprone.ChecksTest" time="0.463"/>
+  <testcase name="synchronizedMethodsAndBlocksFail" classname="parity.errorprone.ChecksTest" time="0.025"/>
+  <testcase name="aStringInALogMessageFails" classname="parity.errorprone.ChecksTest" time="0.039"/>
+  <testcase name="constantsNumbersEnumsAndPathsMayBeInMessages" classname="parity.errorprone.ChecksTest" time="0.111"/>
+  <testcase name="reentrantLocksPass" classname="parity.errorprone.ChecksTest" time="0.032"/>
+  <testcase name="aStringInAnExceptionMessageFails" classname="parity.errorprone.ChecksTest" time="0.037"/>
+</testsuite>

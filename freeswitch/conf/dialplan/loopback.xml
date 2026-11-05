@@ -1,0 +1,21 @@
+<!-- The loopback carrier (TC ADR 0002 §4): TC originates loopback/tcleg-<leg>-<token>/loopback
+     with &park(); loopback-b lands here and parks; TC then sets its switch_r_sdp and bypass_media
+     and bridges it to the agent or the PSTN, whose leg inherits proxy mode. Both ids are TC's own
+     UUIDs, checked by the pattern. -->
+<include>
+  <context name="loopback">
+    <extension name="tc-leg">
+      <condition field="destination_number" expression="^tcleg-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$">
+        <action application="set" data="cc_managed=true"/>
+        <action application="set" data="cc_role=loopback-b"/>
+        <action application="set" data="cc_leg_id=$1"/>
+        <action application="set" data="cc_session_token=$2"/>
+        <!-- TC-031: the bridge copies no X- header onto the far end's leg (mod_sofia copies the
+             originator's sip_h_* unless this is false); the only ones it sends are the dial
+             string's, so an agent's X-Parity-* headers are TC's. -->
+        <action application="set" data="sip_copy_custom_headers=false"/>
+        <action application="park"/>
+      </condition>
+    </extension>
+  </context>
+</include>

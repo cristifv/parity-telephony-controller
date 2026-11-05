@@ -1,0 +1,4 @@
+<include>
+  <!-- No users in production: agents register with opensips (step 8). The test overlay adds
+       compose/freeswitch-test/directory/agents.xml for the test browser. -->
+</include>

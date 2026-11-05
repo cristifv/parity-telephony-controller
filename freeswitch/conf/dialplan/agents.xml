@@ -1,0 +1,10 @@
+<!-- Agents never call in through freeswitch: every leg to an agent is TC's originate. -->
+<include>
+  <context name="agents">
+    <extension name="nothing">
+      <condition field="destination_number" expression="^.*$">
+        <action application="hangup" data="CALL_REJECTED"/>
+      </condition>
+    </extension>
+  </context>
+</include>

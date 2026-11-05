@@ -1,0 +1,10 @@
+<configuration name="json_cdr.conf" description="JSON CDR">
+  <settings>
+    <!-- Files only, one per leg ("<uuid>.cdr.json"), plain values. They hold numbers: the media
+         role gives the directory mode 0750 and 25 h retention (step 8); TC reads it read-only. -->
+    <param name="log-dir" value="$${json_cdr_dir}"/>
+    <param name="log-b-leg" value="true"/>
+    <param name="prefix-a-leg" value="false"/>
+    <param name="encode-values" value="false"/>
+  </settings>
+</configuration>

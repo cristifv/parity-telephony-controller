@@ -1,0 +1,39 @@
+<!-- Arrivals (TC ADR 0002 §3). The dialplan parks; TC sees CHANNEL_PARK on its event connection
+     and offers the call to interaction-engine. Nothing answers here, and there is no hangup hook:
+     only TC writes one, after accepting the arrival, from a token it minted (R1-1). The safety
+     hangup answers 503 after 10 s unless TC takes the call (sched_del <uuid> at the claim). -->
+<include>
+  <context name="carrier">
+    <extension name="arrival">
+      <condition field="destination_number" expression="^\+?[0-9]{1,20}$">
+        <!-- TC-031: X-Parity-* headers are TC's alone (an agent's page auto-answers on them). A
+             carrier's copies are removed (unset matches any case), and nothing this channel holds
+             is copied onto a leg it might bridge. Repeats (sofia names them sip_h_<name>-1, -2)
+             and other X-Parity-* names can't be unset by prefix here: they stay inert, never read
+             or copied (TC-032: opensips to strip them at the edge). -->
+        <action application="unset" data="sip_h_X-Parity-Interaction-Id"/>
+        <action application="unset" data="sip_h_X-Parity-Leg-Id"/>
+        <action application="set" data="sip_copy_custom_headers=false"/>
+        <action application="set" data="cc_managed=true"/>
+        <action application="set" data="cc_role=arrival"/>
+        <action application="set" data="cc_leg_id=${uuid}"/>
+        <action application="set" data="cc_interaction_id=${sip_h_X-Interaction-ID}"/>
+        <action application="set" data="cc_tenant_id=${sip_h_X-Tenant-ID}"/>
+        <action application="set" data="cc_bin=${sip_h_X-CC-Bin}"/>
+        <action application="set" data="cc_trunk_id=${sip_h_X-CC-Trunk}"/>
+        <action application="set" data="bypass_media=true"/>
+        <!-- (c+): freeswitch answers re-INVITEs itself with the leg's SDP; the hook tells TC. -->
+        <action application="set" data="sip_ignore_reinvites=true"/>
+        <action application="set" data="execute_on_sip_reinvite=event Event-Name=CUSTOM,Event-Subclass=parity::reinvite,cc_leg=${uuid}"/>
+      </condition>
+      <!-- Test only (compose's vars.xml): the scripts' leg ids. -->
+      <condition field="${tc_test_headers}" expression="^true$" break="never">
+        <action application="set" data="cc_leg_id=${sip_h_X-Test-Leg-ID}"/>
+      </condition>
+      <condition field="destination_number" expression="^.+$">
+        <action application="sched_hangup" data="+10 NORMAL_TEMPORARY_FAILURE"/>
+        <action application="park"/>
+      </condition>
+    </extension>
+  </context>
+</include>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The tests' logging (it takes precedence over logback-spring.xml, for Spring Boot's tests too):
+     the production format and appender (obs.LogRecordEncoder behind obs.CountingAsyncAppender),
+     on stdout as in production, and also into a capture file that scripts/ci.sh checks with
+     parity-contracts' contract-check (log-record.v1, logging/events.parity-telephony-controller.v1.json).
+     tc.test-log-file is set per test JVM by the pom (surefire: unit.ndjson, failsafe: it.ndjson). -->
+<configuration>
+  <shutdownHook class="ch.qos.logback.core.hook.DefaultShutdownHook"/>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="parity.telephonycontroller.obs.LogRecordEncoder"/>
+  </appender>
+  <appender name="ASYNC_CONSOLE" class="parity.telephonycontroller.obs.CountingAsyncAppender">
+    <queueSize>8192</queueSize>
+    <discardingThreshold>0</discardingThreshold>
+    <neverBlock>true</neverBlock>
+    <maxFlushTime>2000</maxFlushTime>
+    <appender-ref ref="CONSOLE"/>
+  </appender>
+  <appender name="CAPTURE_FILE" class="ch.qos.logback.core.FileAppender">
+    <file>${tc.test-log-file:-target/test-logs/tests.ndjson}</file>
+    <append>true</append>
+    <encoder class="parity.telephonycontroller.obs.LogRecordEncoder"/>
+  </appender>
+  <appender name="CAPTURE" class="parity.telephonycontroller.obs.CountingAsyncAppender">
+    <queueSize>8192</queueSize>
+    <discardingThreshold>0</discardingThreshold>
+    <neverBlock>true</neverBlock>
+    <maxFlushTime>2000</maxFlushTime>
+    <appender-ref ref="CAPTURE_FILE"/>
+  </appender>
+  <!-- The masking probes log numbers and digits on purpose (and records without an event):
+       stdout only, where their own assertions read them; never in the capture. -->
+  <logger name="parity.telephonycontroller.obs.LoggingPathTest" level="INFO" additivity="false">
+    <appender-ref ref="ASYNC_CONSOLE"/>
+  </logger>
+  <logger name="parity.telephonycontroller" level="DEBUG"/>
+  <root level="INFO">
+    <appender-ref ref="ASYNC_CONSOLE"/>
+    <appender-ref ref="CAPTURE"/>
+  </root>
+</configuration>

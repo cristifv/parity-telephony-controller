@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>4.1.1</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>parity</groupId>
+  <artifactId>parity-telephony-controller</artifactId>
+  <version>0.1.0</version>
+  <name>parity-telephony-controller</name>
+  <description>The telephony controller: one per media node, it drives freeswitch (ESL) and parity-ms for interaction-engine. Step 5: the telephony.v1 gRPC server (fencing, delivery, journal) on a simulated node, and fake-telephony-controller</description>
+
+  <properties>
+    <java.version>21</java.version>
+    <!-- parity-contracts (a plain sibling directory until git): the cross-language masking cases. -->
+    <parity.contracts.dir>${project.basedir}/../parity-contracts</parity.contracts.dir>
+    <!-- The newest release at least 14 days old on 2026-10-25 (2.7.1: 2026-01). -->
+    <license-maven-plugin.version>2.7.1</license-maven-plugin.version>
+    <cyclonedx-maven-plugin.version>2.9.3</cyclonedx-maven-plugin.version>
+    <!-- Security advisories beat Spring Boot 4.1.1's managed versions (OSV-Scanner, 2026-10-26):
+         Tomcat 11.0.24 (GHSA-9xv2-5v5q-p794, GHSA-gcx9-497g-6cp6, GHSA-h3x4-894j-xpx5; fixed in
+         11.0.25; 11.0.27 is the newest at least 14 days old) and Jackson 3.1.5
+         (GHSA-7hhh-6rmp-j9qf and five more; fixed in 3.1.7, the line Spring Boot 4.1 manages). -->
+    <tomcat.version>11.0.27</tomcat.version>
+    <!-- grpc-java (1.83.1), protobuf (4.35.1) and the ascopes protobuf plugin (5.1.8) are the
+         versions Spring Boot 4.1.1 manages; protoc and protoc-gen-grpc-java follow them. -->
+    <archunit.version>1.5.1</archunit.version>
+    <jackson-bom.version>3.1.7</jackson-bom.version>
+    <!-- OSV (2026-10-27, TC-033/TC-037): grpc-netty-shaded 1.83.1 brings guava 33.6.0-android
+         (GHSA-xxph-c9ww-hj94 HIGH); 33.7.2-android (2026-09-29) is the fixed release at least 14
+         days old. -->
+    <guava.version>33.7.2-android</guava.version>
+    <!-- Error Prone 2.50.0 (2026-06-10): the newest at least 14 days old (2.51.0 is 2026-10-22). -->
+    <errorprone.version>2.50.0</errorprone.version>
+    <parity-errorprone-checks.version>0.1.0</parity-errorprone-checks.version>
+    <jqwik.version>1.10.2</jqwik.version>
+    <jazzer.version>0.30.0</jazzer.version>
+    <errorprone.flags>-XepDisableWarningsInGeneratedCode -XepExcludedPaths:.*/generated-(test-)?sources/.* -Xep:FutureReturnValueIgnored:ERROR -Xep:GuardedBy:ERROR -Xep:UnusedVariable:ERROR -Xep:MissingCasesInEnumSwitch:ERROR</errorprone.flags>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+
+    <!-- telephony.v1 (TC ADR 0001 §7): grpc-java with the shaded Netty; stubs generated below. -->
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-netty-shaded</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-protobuf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-stub</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+    </dependency>
+    <!-- JsonFormat: protobuf messages logged only as masked maps (ADR §4.7, R1-5). -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java-util</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit-junit5</artifactId>
+      <version>${archunit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- The ESL codec's properties (TC ADR 0002 §1): jqwik 1.10.2 (2026-10-10, EPL-2.0). -->
+    <dependency>
+      <groupId>net.jqwik</groupId>
+      <artifactId>jqwik</artifactId>
+      <version>${jqwik.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- The ESL decoder's fuzz target: Jazzer 0.30.0 (2026-02-24, Apache-2.0); its corpus runs in
+         every test run, scripts/fuzz.sh fuzzes. -->
+    <dependency>
+      <groupId>com.code-intelligence</groupId>
+      <artifactId>jazzer-junit</artifactId>
+      <version>${jazzer.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Stubs from parity-contracts' telephony.proto: protoc and protoc-gen-grpc-java come from
+           Maven Central at the versions of the runtime libraries. -->
+      <plugin>
+        <groupId>io.github.ascopes</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <protoc>${protobuf-java.version}</protoc>
+          <sourceDirectories>
+            <sourceDirectory>${parity.contracts.dir}/proto</sourceDirectory>
+          </sourceDirectories>
+          <includes>
+            <include>parity/telephony/v1/*.proto</include>
+          </includes>
+          <embedSourcesInClassOutputs>false</embedSourcesInClassOutputs>
+          <plugins>
+            <plugin kind="binary-maven">
+              <groupId>io.grpc</groupId>
+              <artifactId>protoc-gen-grpc-java</artifactId>
+              <version>${grpc-java.version}</version>
+              <options>@generated=omit</options>
+            </plugin>
+          </plugins>
+        </configuration>
+      </plugin>
+      <!-- Static analysis (TC ADR 0002 §8, R1-2): javac's lint and Error Prone, with our own checks
+           (tools/errorprone-checks, installed by scripts/ci.sh first). Every warning fails the build.
+           .mvn/jvm.config opens javac's internals to Error Prone. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <compilerArgs>
+            <arg>-Xlint:all,-processing,-serial</arg>
+            <arg>-Werror</arg>
+            <arg>-XDcompilePolicy=simple</arg>
+            <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
+            <arg>--should-stop=ifError=FLOW</arg>
+            <arg>-Xplugin:ErrorProne ${errorprone.flags}</arg>
+          </compilerArgs>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>com.google.errorprone</groupId>
+              <artifactId>error_prone_core</artifactId>
+              <version>${errorprone.version}</version>
+            </path>
+            <path>
+              <groupId>parity</groupId>
+              <artifactId>parity-errorprone-checks</artifactId>
+              <version>${parity-errorprone-checks.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+        <executions>
+          <!-- Tests may use synchronized (no virtual-thread wait paths there), and their assertion
+               messages name their own synthetic data. -->
+          <execution>
+            <id>default-testCompile</id>
+            <configuration>
+              <compilerArgs>
+                <arg>-Xlint:all,-processing,-serial</arg>
+                <arg>-Werror</arg>
+                <arg>-XDcompilePolicy=simple</arg>
+            <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
+                <arg>--should-stop=ifError=FLOW</arg>
+                <arg>-Xplugin:ErrorProne ${errorprone.flags} -Xep:NoSynchronized:OFF -Xep:NoDataInMessages:OFF -Xep:StringSplitter:OFF</arg>
+              </compilerArgs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- R1-2: a virtual thread pinned while it waits prints a trace; each test's output goes
+               to a file that scripts/check-pins.sh fails the build on. -->
+          <argLine>-Djdk.tracePinnedThreads=short</argLine>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <systemPropertyVariables>
+            <parity.contracts.dir>${parity.contracts.dir}</parity.contracts.dir>
+            <!-- The log-record.v1 capture scripts/ci.sh checks (src/test/resources/logback-test.xml). -->
+            <tc.test-log-file>${project.build.directory}/test-logs/unit.ndjson</tc.test-log-file>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <!-- Tests against the packaged jar and real containers (*IT): after `package`. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <argLine>-Djdk.tracePinnedThreads=short</argLine>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <systemPropertyVariables>
+            <tc.jar>${project.build.directory}/${project.build.finalName}.jar</tc.jar>
+            <tc.basedir>${project.basedir}</tc.basedir>
+            <tc.test-log-file>${project.build.directory}/test-logs/it.ndjson</tc.test-log-file>
+          </systemPropertyVariables>
+          <environmentVariables>
+            <!-- Ryuk needs the docker socket inside a container, which SELinux refuses on this
+                 host; each test removes its own containers instead. -->
+            <TESTCONTAINERS_RYUK_DISABLED>true</TESTCONTAINERS_RYUK_DISABLED>
+          </environmentVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[21,22)</version>
+                </requireJavaVersion>
+                <requireMavenVersion>
+                  <version>[3.9,)</version>
+                </requireMavenVersion>
+                <banDuplicatePomDependencyVersions/>
+                <bannedDependencies>
+                  <excludes>
+                    <!-- Logging stays SLF4J + Logback through Spring Boot (Spring Framework 7's own
+                         commons-logging bridge is allowed). No Lombok here. -->
+                    <exclude>log4j:log4j</exclude>
+                    <exclude>org.apache.logging.log4j:log4j-core</exclude>
+                    <exclude>org.projectlombok:lombok</exclude>
+                  </excludes>
+                </bannedDependencies>
+                <requireReleaseDeps>
+                  <message>No snapshot dependencies.</message>
+                </requireReleaseDeps>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- The runtime SBOM (target/bom.json) that scripts/ci.sh scans with OSV-Scanner. -->
+      <plugin>
+        <groupId>org.cyclonedx</groupId>
+        <artifactId>cyclonedx-maven-plugin</artifactId>
+        <version>${cyclonedx-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>sbom</id>
+            <phase>package</phase>
+            <goals>
+              <goal>makeBom</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <outputFormat>json</outputFormat>
+          <outputName>bom</outputName>
+        </configuration>
+      </plugin>
+      <!-- The licence allow-list: every runtime and test dependency's licence, normalised by
+           licenseMerges, must be in includedLicenses, or `verify` fails. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${license-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>licences</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <failOnMissing>true</failOnMissing>
+          <failOnBlacklist>true</failOnBlacklist>
+          <!-- An artifact whose licence name is unversioned or ambiguous ("BSD License", "GNU
+               Lesser General Public License") is resolved here, one artifact at a time, after
+               reading its licence: never by a merge. -->
+          <overrideUrl>file://${project.basedir}/src/license/override-THIRD-PARTY.properties</overrideUrl>
+          <includedLicenses>
+            <includedLicense>Apache-2.0</includedLicense>
+            <includedLicense>MIT</includedLicense>
+            <includedLicense>MIT-0</includedLicense>
+            <includedLicense>BSD-2-Clause</includedLicense>
+            <includedLicense>BSD-3-Clause</includedLicense>
+            <includedLicense>EPL-1.0</includedLicense>
+            <includedLicense>EPL-2.0</includedLicense>
+            <includedLicense>EDL-1.0</includedLicense>
+            <includedLicense>MPL-2.0</includedLicense>
+            <includedLicense>CC0-1.0</includedLicense>
+            <includedLicense>LGPL-2.1</includedLicense>
+            <includedLicense>CDDL-1.0</includedLicense>
+            <includedLicense>CDDL-1.1</includedLicense>
+            <includedLicense>CDDL-GPL-CE</includedLicense>
+            <includedLicense>GPL-2.0-CE</includedLicense>
+          </includedLicenses>
+          <!-- Only names that say which licence and which version they are. -->
+          <licenseMerges>
+            <licenseMerge>Apache-2.0|Apache License, Version 2.0|The Apache Software License, Version 2.0|Apache 2.0|Apache License 2.0|The Apache License, Version 2.0|Apache License Version 2.0|Apache Software License - Version 2.0|Apache License, version 2.0</licenseMerge>
+            <licenseMerge>MIT|The MIT License|MIT License|The MIT License (MIT)|MIT license</licenseMerge>
+            <licenseMerge>BSD-2-Clause|BSD 2-Clause License|The BSD 2-Clause License</licenseMerge>
+            <licenseMerge>BSD-3-Clause|BSD 3-Clause License|The BSD 3-Clause License|BSD-3-Clause License</licenseMerge>
+            <licenseMerge>EDL-1.0|Eclipse Distribution License - v 1.0|EDL 1.0|Eclipse Distribution License v. 1.0</licenseMerge>
+            <licenseMerge>EPL-1.0|Eclipse Public License 1.0|Eclipse Public License - v 1.0</licenseMerge>
+            <licenseMerge>EPL-2.0|Eclipse Public License 2.0|Eclipse Public License v2.0|Eclipse Public License - v 2.0|EPL 2.0|Eclipse Public License - Version 2.0</licenseMerge>
+            <licenseMerge>MPL-2.0|Mozilla Public License 2.0|Mozilla Public License Version 2.0</licenseMerge>
+            <licenseMerge>CC0-1.0|Public Domain, per Creative Commons CC0|CC0 1.0 Universal</licenseMerge>
+            <licenseMerge>LGPL-2.1|GNU Lesser General Public License, Version 2.1|LGPL 2.1|LGPL-2.1-only</licenseMerge>
+            <licenseMerge>CDDL-1.0|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0</licenseMerge>
+            <licenseMerge>CDDL-1.1|CDDL 1.1</licenseMerge>
+            <licenseMerge>CDDL-GPL-CE|CDDL + GPLv2 with classpath exception|CDDL/GPLv2+CE</licenseMerge>
+            <licenseMerge>GPL-2.0-CE|GPL2 w/ CPE|GNU General Public License, version 2 with the GNU Classpath Exception</licenseMerge>
+          </licenseMerges>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

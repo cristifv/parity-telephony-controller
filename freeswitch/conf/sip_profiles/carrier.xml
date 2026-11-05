@@ -1,0 +1,27 @@
+<!-- Carriers (through opensips): every inbound call in bypass (proxy) mode, so freeswitch never
+     opens RTP; G.711 as offered (PLAN's codec policy). Session timers on; freeswitch's own
+     refreshes are UPDATEs without SDP. -->
+<profile name="carrier">
+  <settings>
+    <param name="context" value="carrier"/>
+    <param name="dialplan" value="XML"/>
+    <param name="sip-ip" value="$${sip_ip}"/>
+    <param name="rtp-ip" value="$${sip_ip}"/>
+    <param name="ext-sip-ip" value="$${sip_ip}"/>
+    <param name="ext-rtp-ip" value="$${sip_ip}"/>
+    <param name="sip-port" value="5080"/>
+    <param name="inbound-bypass-media" value="true"/>
+    <param name="inbound-late-negotiation" value="true"/>
+    <param name="disable-transcoding" value="true"/>
+    <param name="auth-calls" value="false"/>
+    <param name="apply-inbound-acl" value="loopback.auto"/>
+    <param name="enable-timer" value="true"/>
+    <param name="session-timeout" value="$${carrier_session_timeout}"/>
+    <param name="minimum-session-expires" value="90"/>
+    <param name="update-refresher" value="true"/>
+    <param name="inbound-codec-prefs" value="PCMU,PCMA"/>
+    <param name="outbound-codec-prefs" value="PCMU,PCMA"/>
+    <param name="manage-presence" value="false"/>
+    <param name="rfc2833-pt" value="101"/>
+  </settings>
+</profile>

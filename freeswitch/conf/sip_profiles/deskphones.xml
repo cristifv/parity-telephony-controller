@@ -1,0 +1,24 @@
+<!-- Desk phones (TC ADR 0002 R1-10): session timers on, freeswitch the refresher by UPDATE; the
+     phone's own re-INVITEs (holds, refreshes) are answered by (c+). -->
+<profile name="deskphones">
+  <settings>
+    <param name="context" value="agents"/>
+    <param name="dialplan" value="XML"/>
+    <param name="sip-ip" value="$${sip_ip}"/>
+    <param name="rtp-ip" value="$${sip_ip}"/>
+    <param name="ext-sip-ip" value="$${sip_ip}"/>
+    <param name="ext-rtp-ip" value="$${sip_ip}"/>
+    <param name="sip-port" value="5092"/>
+    <param name="inbound-bypass-media" value="true"/>
+    <param name="disable-transcoding" value="true"/>
+    <param name="enable-timer" value="true"/>
+    <param name="session-timeout" value="$${deskphone_session_timeout}"/>
+    <param name="minimum-session-expires" value="90"/>
+    <param name="update-refresher" value="true"/>
+    <param name="auth-calls" value="false"/>
+    <param name="apply-inbound-acl" value="loopback.auto"/>
+    <param name="inbound-codec-prefs" value="PCMU,PCMA"/>
+    <param name="outbound-codec-prefs" value="PCMU,PCMA"/>
+    <param name="manage-presence" value="false"/>
+  </settings>
+</profile>

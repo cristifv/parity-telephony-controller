@@ -1,0 +1,751 @@
+{
+  "schema_version": 1,
+  "service": "parity-telephony-controller",
+  "description": "parity-telephony-controller's log events (log-record.v1, parity-contracts CONVENTIONS \"Logging\"; started from logging/examples/ of parity-contracts 0.13.0, owned here). Every TC log call names one of these, or a common one (logging/events.common.v1.json), with addKeyValue(\"event\", \"<name>\"); a record without one is log.unclassified, in no catalogue, so scripts/ci.sh's contract-check fails it. Call-scoped records carry the xsid (the interaction id, a UUIDv7) and the tenant.",
+  "events": {
+    "arrival.accept_failed": {
+      "description": "freeswitch couldn't take an accepted arrival's hook (ESL unavailable): the dialplan's safety hangup ends the call (503).",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "arrival.backstop_delete_failed": {
+      "description": "A claimed arrival's backstop hangup couldn't be deleted (ESL unavailable).",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "arrival.backstop_missing": {
+      "description": "An arrival's safety hangup wasn't there to delete when it was claimed (R1-4): counted, alerted, the claim refused.",
+      "levels": [
+        "error"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "arrival.duplicated": {
+      "description": "An arrival for an interaction that already has a session on another leg: refused with 503 (counted).",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "arrival.refuse_failed": {
+      "description": "An arrival TC refuses couldn't be answered 503 (ESL unavailable); its safety hangup ends it.",
+      "levels": [
+        "warn"
+      ],
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "cdr_file.list_failed": {
+      "description": "freeswitch's CDR directory couldn't be listed.",
+      "levels": [
+        "warn"
+      ],
+      "requires": [
+        "error"
+      ]
+    },
+    "cdr_file.read_failed": {
+      "description": "A freeswitch CDR file couldn't be read or parsed; skipped.",
+      "levels": [
+        "warn"
+      ],
+      "requires": [
+        "error"
+      ]
+    },
+    "channel.kill_failed": {
+      "description": "A channel couldn't be killed (ESL unavailable).",
+      "levels": [
+        "warn"
+      ]
+    },
+    "channel.refuse_failed": {
+      "description": "A channel couldn't be answered with a refusal (ESL unavailable).",
+      "levels": [
+        "warn"
+      ]
+    },
+    "channel_snapshot.failed": {
+      "description": "The channel snapshot after an ESL (re)connect failed: not ready yet; retried with a backoff.",
+      "levels": [
+        "warn"
+      ],
+      "requires": [
+        "error"
+      ]
+    },
+    "delivery.dropped": {
+      "description": "Unacknowledged events of a session were dropped by the delivery limits (counted); IE resyncs from the gap. Once per session.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "attrs": [
+        "delivery_seq"
+      ]
+    },
+    "digits.off_failed": {
+      "description": "A leg's digit reporting couldn't be turned off in parity-ms (at its collection's deadline: warn; at a fence raise, PCI: error, counted); TC's side is off.",
+      "levels": [
+        "warn",
+        "error"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "drain.completed": {
+      "description": "The drain finished in time: the drained file is written (attrs.file, attrs.drain_ms).",
+      "levels": [
+        "info"
+      ],
+      "attrs": [
+        "file",
+        "drain_ms"
+      ]
+    },
+    "drain.failed": {
+      "description": "The drain didn't finish in time (attrs.waiting_for) or failed: no drained file; the exit code is 1.",
+      "levels": [
+        "error"
+      ]
+    },
+    "drained_file.failed": {
+      "description": "Drained, but the drained file couldn't be written (attrs.file).",
+      "levels": [
+        "error"
+      ],
+      "requires": [
+        "error"
+      ],
+      "attrs": [
+        "file"
+      ]
+    },
+    "engine.started": {
+      "description": "The telephony engine started: attrs.engine_incarnation is the Watch stream's incarnation (the logs' own unless the clock went back), attrs.bins the zone's bins.",
+      "levels": [
+        "info"
+      ],
+      "attrs": [
+        "engine_incarnation",
+        "bins"
+      ]
+    },
+    "esl.connection_lost": {
+      "description": "An ESL connection to freeswitch was lost (the supervisor reconnects).",
+      "levels": [
+        "info"
+      ]
+    },
+    "esl.cycle_failed": {
+      "description": "Another ESL connection attempt failed during an outage already reported (dependency.unavailable).",
+      "levels": [
+        "debug"
+      ],
+      "requires": [
+        "error"
+      ]
+    },
+    "esl.probe_timed_out": {
+      "description": "No ESL probe came back within attrs.deadline_ms: the connections are presumed dead and reopened.",
+      "levels": [
+        "warn"
+      ],
+      "attrs": [
+        "deadline_ms"
+      ]
+    },
+    "esl.protocol_violated": {
+      "description": "freeswitch sent what the ESL decoder refuses (attrs.reason): the connection is closed.",
+      "levels": [
+        "warn"
+      ],
+      "attrs": [
+        "reason"
+      ]
+    },
+    "esl_event.failed": {
+      "description": "An ESL event (attrs.esl_event) couldn't be handled: a bug; the event is lost.",
+      "levels": [
+        "error"
+      ],
+      "requires": [
+        "error"
+      ],
+      "attrs": [
+        "esl_event"
+      ]
+    },
+    "esl_event.skipped": {
+      "description": "An ESL event that doesn't parse (attrs.reason) was skipped.",
+      "levels": [
+        "warn"
+      ],
+      "attrs": [
+        "reason"
+      ]
+    },
+    "esl_frame.ignored": {
+      "description": "An ESL frame of a content type TC doesn't use (attrs.content_type).",
+      "levels": [
+        "debug"
+      ],
+      "attrs": [
+        "content_type"
+      ]
+    },
+    "esl_reply.unmatched": {
+      "description": "An ESL reply came with no command waiting.",
+      "levels": [
+        "warn"
+      ]
+    },
+    "freeswitch.media_bound": {
+      "description": "freeswitch bound RTP ports in the canary range: it is taking media it must not (attrs.ports). Every 10 s while it lasts.",
+      "levels": [
+        "error"
+      ],
+      "attrs": [
+        "ports"
+      ]
+    },
+    "freeswitch.restarted": {
+      "description": "freeswitch restarted (a new Core-UUID): every leg is gone.",
+      "levels": [
+        "warn"
+      ]
+    },
+    "health_file.failed": {
+      "description": "The healthy file couldn't be written (counted, retried with a backoff) or removed.",
+      "levels": [
+        "error"
+      ],
+      "requires": [
+        "error"
+      ]
+    },
+    "hold.music_failed": {
+      "description": "The hold music didn't start (attrs.reason): the hold stands without music.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ],
+      "attrs": [
+        "reason"
+      ]
+    },
+    "journal.record_dropped": {
+      "description": "The journal's queue was full: a record was dropped; freeswitch's CDR files remain.",
+      "levels": [
+        "error"
+      ]
+    },
+    "journal.write_failed": {
+      "description": "The journal couldn't write a record.",
+      "levels": [
+        "error"
+      ],
+      "requires": [
+        "error"
+      ]
+    },
+    "leg.adopted_late": {
+      "description": "A leg freeswitch's channel listing showed only after the snapshot: adopted now.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "leg.answer_failed": {
+      "description": "parity-ms couldn't take a leg's answer: the leg ends (MEDIA_FAILED).",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "leg.bridge_failed": {
+      "description": "The loopback carrier couldn't bridge an originated leg: the leg fails (UNREACHABLE).",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "leg.detach_failed": {
+      "description": "A leg whose DTMF codes parity-ms refused couldn't be detached from the call's media.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "leg.dial_failed": {
+      "description": "The bridge to an originated leg's far end failed: attrs.disposition (freeswitch's cause).",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ],
+      "attrs": [
+        "disposition"
+      ]
+    },
+    "leg.end_failed": {
+      "description": "A leg TC had to end (its customer left, or past its ring timeout) couldn't be hung up; its hook or the next sync ends it.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "leg.ended": {
+      "description": "A leg hung up (freeswitch's hangup): attrs.role, attrs.hangup_cause, attrs.sip_status, attrs.by_tc (TC ended it).",
+      "levels": [
+        "info"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ],
+      "attrs": [
+        "role",
+        "hangup_cause",
+        "sip_status",
+        "by_tc"
+      ]
+    },
+    "leg.fence_write_failed": {
+      "description": "A raised fence couldn't be written on a new leg's channel variables.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "leg.hook_failed": {
+      "description": "An originated customer leg's hangup hook couldn't be written.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "leg.hook_mismatched": {
+      "description": "A leg's hangup hook didn't read back as written (R1-1): the leg ends (503), alerted.",
+      "levels": [
+        "error"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "leg.media_release_failed": {
+      "description": "parity-ms couldn't release an ended leg's media (detach or delete); its recording results are TC's own.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "leg.refused": {
+      "description": "An AddLeg's agent contact was refused before dialling (TC-056): attrs.reason (tenant_mismatch or invalid_target), attrs.rule.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ],
+      "attrs": [
+        "reason",
+        "rule"
+      ]
+    },
+    "lifecycle_file.removed": {
+      "description": "A healthy or drained file left by an earlier run was removed at start (attrs.file).",
+      "levels": [
+        "info"
+      ],
+      "attrs": [
+        "file"
+      ]
+    },
+    "log.external": {
+      "description": "A record of a library TC uses (Spring, gRPC, Tomcat...; component names the logger): its own text in msg (attrs.text when longer).",
+      "levels": [
+        "trace",
+        "debug",
+        "info",
+        "warn",
+        "error"
+      ]
+    },
+    "mailbox.overflowed": {
+      "description": "A session's mailbox was full: a node fact was dropped (counted) and the session resyncs from the node.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true
+    },
+    "media.dtmf_actions_limited": {
+      "description": "parity-ms (an older release) can't lock the recording or mode with DTMF codes: attrs.dropped codes were left out (TC-048).",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "attrs": [
+        "dropped"
+      ]
+    },
+    "media.prompt_wait_refused": {
+      "description": "parity-ms waits for a prompt as long as TC's timeout or longer (MS-042): TC refuses to start, or refuses plays once a hello says so.",
+      "levels": [
+        "error"
+      ],
+      "attrs": [
+        "prompt_wait_ms",
+        "timeout_ms"
+      ]
+    },
+    "media.recording_sink_reported": {
+      "description": "parity-ms's hello named its recording sink (attrs.sink; attrs.tc_allows_null_sink).",
+      "levels": [
+        "info"
+      ],
+      "attrs": [
+        "sink"
+      ]
+    },
+    "media.request_refused": {
+      "description": "parity-ms refused a request TC sent (attrs.cmd, error.code): reported to IE as PARITY_MS_UNAVAILABLE.",
+      "levels": [
+        "warn"
+      ],
+      "attrs": [
+        "cmd"
+      ]
+    },
+    "media.restarted": {
+      "description": "parity-ms restarted (a new incarnation in its hello): every session's media is gone; the sessions are told.",
+      "levels": [
+        "error"
+      ]
+    },
+    "media.session_ended": {
+      "description": "parity-ms ended a call's media itself (idle timeout, shutdown): attrs.reason; the call's legs end.",
+      "levels": [
+        "warn"
+      ],
+      "attrs": [
+        "reason"
+      ]
+    },
+    "media.subscribe_refused": {
+      "description": "parity-ms refused the event subscription (a replay gap: the live tail is taken; the sweep reconciles).",
+      "levels": [
+        "warn"
+      ]
+    },
+    "media_call.missing": {
+      "description": "A first leg TC originates has no parity-ms call to attach to (TC-008): the AddLeg fails.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true
+    },
+    "media_call.orphan_delete_failed": {
+      "description": "The sweep couldn't delete an orphaned parity-ms call; the next sweep tries again.",
+      "levels": [
+        "warn"
+      ]
+    },
+    "media_call.orphan_deleted": {
+      "description": "The sweep deleted a parity-ms call with no live leg in TC (two sweeps in a row).",
+      "levels": [
+        "warn"
+      ]
+    },
+    "media_sweep.failed": {
+      "description": "A media sweep (orphans, activity) failed; the next one runs in 5 s.",
+      "levels": [
+        "warn"
+      ],
+      "requires": [
+        "error"
+      ]
+    },
+    "node_lock.acquired": {
+      "description": "This controller holds the node lock (attrs.lock_file): it is the node's only one.",
+      "levels": [
+        "info"
+      ],
+      "attrs": [
+        "lock_file"
+      ]
+    },
+    "node_lock.refused": {
+      "description": "Another controller holds the node lock (attrs.lock_file): this one refuses to start (exit 3).",
+      "levels": [
+        "error"
+      ],
+      "attrs": [
+        "lock_file"
+      ]
+    },
+    "node_lock.release_failed": {
+      "description": "Releasing the node lock failed (the process is exiting anyway).",
+      "levels": [
+        "warn"
+      ],
+      "requires": [
+        "error"
+      ]
+    },
+    "node_lock.released": {
+      "description": "The node lock was released after the drain.",
+      "levels": [
+        "info"
+      ],
+      "attrs": [
+        "lock_file"
+      ]
+    },
+    "play.compensated": {
+      "description": "A play TC no longer wants (stopped, replaced, its leg left, the hold ended) was stopped by its id (the play saga's compensation, counted by attrs.reason): info when TC stops it on cancelling, warn when the play started after TC gave it up. attrs.play_wire_id is the play's id at parity-ms.",
+      "levels": [
+        "info",
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ],
+      "attrs": [
+        "reason"
+      ]
+    },
+    "play.compensation_deferred": {
+      "description": "parity-ms didn't answer a compensating stop: the play stays cancelled and is stopped if it starts later (attrs.reason).",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ],
+      "attrs": [
+        "reason"
+      ]
+    },
+    "play.loop_failed": {
+      "description": "A looped prompt the media plays once couldn't be played again.",
+      "levels": [
+        "warn"
+      ],
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "play.prompt_unavailable": {
+      "description": "parity-ms can't play a prompt of a call it has (a missing, unreadable or corrupt file): only this Play fails (PROMPT_UNKNOWN).",
+      "levels": [
+        "warn"
+      ]
+    },
+    "play.untracked_finished": {
+      "description": "parity-ms reported the end of a play TC doesn't track (one it gave up on): ignored.",
+      "levels": [
+        "warn"
+      ],
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "readiness.passed": {
+      "description": "Every readiness check passes; the healthy file follows (service.ready).",
+      "levels": [
+        "info"
+      ]
+    },
+    "recording.null_sink_enabled": {
+      "description": "The null recording sink is on (recording-sink=null; local test setups only, until R9): StartRecording records nothing.",
+      "levels": [
+        "warn"
+      ],
+      "attrs": [
+        "sink"
+      ]
+    },
+    "recording.refused": {
+      "description": "StartRecording refused: no recording sink for this request on this node (R9); attrs.sink.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ],
+      "attrs": [
+        "sink"
+      ]
+    },
+    "recording.result_missing": {
+      "description": "A recording's result didn't come from parity-ms in time: TC reports its own figures.",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "recording.sink_violated": {
+      "description": "parity-ms opened a recording file although its sink is null: stopped at once.",
+      "levels": [
+        "error"
+      ],
+      "call_scoped": true
+    },
+    "recording.started": {
+      "description": "A recording started on a leg (attrs.recording_id; attrs.sink null: nothing is written, local test setups only).",
+      "levels": [
+        "info"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ],
+      "attrs": [
+        "recording_id",
+        "sink"
+      ]
+    },
+    "reinvite.sdp_unversioned": {
+      "description": "A re-INVITE changed the SDP without raising its o= version (counted).",
+      "levels": [
+        "warn"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "reinvite.unanswerable": {
+      "description": "A re-INVITE TC can't answer (another codec, or port 0): alerted on every one (R2-5).",
+      "levels": [
+        "error"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id"
+      ]
+    },
+    "rpc.failed": {
+      "description": "A telephony.v1 call failed on an unexpected error (a bug): answered INTERNAL.",
+      "levels": [
+        "error"
+      ],
+      "requires": [
+        "error"
+      ]
+    },
+    "session.arrived": {
+      "description": "A call arrived from the edge (freeswitch parked it) and TC took it: the session exists and the arrival is offered to IE. The xsid is the interaction id from X-Parity-Interaction-Id (X-Interaction-ID until opensips moves). attrs.endpoint: SIP or WEBRTC.",
+      "levels": [
+        "info"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "leg_id",
+        "bin"
+      ],
+      "attrs": [
+        "endpoint"
+      ]
+    },
+    "session.ended": {
+      "description": "A call's session ended (SessionEnded is sent to IE): attrs.reason (SessionEndReason), attrs.sip_status; owner_epoch is the fence (0: no owner ever claimed it).",
+      "levels": [
+        "info"
+      ],
+      "call_scoped": true,
+      "requires": [
+        "owner_epoch"
+      ],
+      "attrs": [
+        "reason",
+        "sip_status"
+      ]
+    },
+    "signal.handlers_failed": {
+      "description": "The signal handlers couldn't be installed: Spring Boot's shutdown hook still drains; only the exit codes differ.",
+      "levels": [
+        "warn"
+      ],
+      "requires": [
+        "error"
+      ]
+    },
+    "signal.received": {
+      "description": "A first SIGTERM or SIGINT (attrs.signal): the drain starts (at once, or once the start is done).",
+      "levels": [
+        "info"
+      ],
+      "attrs": [
+        "signal"
+      ]
+    },
+    "watch.failed": {
+      "description": "A Watch stream failed on an unexpected error (a bug): closed with INTERNAL.",
+      "levels": [
+        "error"
+      ],
+      "requires": [
+        "error"
+      ]
+    }
+  }
+}

@@ -1,0 +1,20 @@
+<include>
+  <!-- The test browser (SIP.js) registers here over WS; TC dials it as user/agent1@127.0.0.1. -->
+  <domain name="127.0.0.1">
+    <params>
+      <param name="dial-string" value="{^^:sip_invite_domain=${dialed_domain}:presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(*/${dialed_user}@${dialed_domain})}"/>
+      <param name="jsonrpc-allowed-methods" value=""/>
+    </params>
+    <groups>
+      <group name="agents">
+        <users>
+          <user id="agent1">
+            <params>
+              <param name="password" value="agent1-test"/>
+            </params>
+          </user>
+        </users>
+      </group>
+    </groups>
+  </domain>
+</include>

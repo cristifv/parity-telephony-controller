@@ -1,0 +1,16 @@
+<configuration name="switch.conf" description="Core Configuration">
+  <settings>
+    <!-- R1-10: 2,000 calls with the loopback pair kept would be 8,000 sessions; 400 created per
+         second at 100 calls/s. -->
+    <param name="max-sessions" value="10000"/>
+    <param name="sessions-per-second" value="1000"/>
+    <!-- The canary (TC ADR 0002 §7): freeswitch in bypass never opens RTP. These 100 ports lie
+         outside parity-ms's 16384-32767 and outside Linux's ephemeral range (32768-60999), so a
+         socket bound in them is freeswitch's; TC alerts if one ever is. -->
+    <param name="rtp-start-port" value="61000"/>
+    <param name="rtp-end-port" value="61099"/>
+    <param name="loglevel" value="info"/>
+    <param name="colorize-console" value="false"/>
+    <param name="dump-cores" value="no"/>
+  </settings>
+</configuration>

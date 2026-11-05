@@ -1,0 +1,16 @@
+# fake-telephony-controller (TC ADR 0001 §6): the telephony.v1 server on a simulated node, a clock
+# that moves only through the control endpoint (port 9702), in-memory owners and journal. For
+# interaction-engine's tests; never a production profile.
+parity:
+  telephony-controller:
+    lock-dir: /tmp/parity-telephony-controller-fake
+    grpc:
+      test-peer-header: true
+    readiness:
+      endpoints:
+        parity-ms: ''
+    node:
+      mode: simulated
+      media: simulated
+      # Recordings run, pause and report, and nothing is written (the null sink: MS-012).
+      recording-sink: 'null'

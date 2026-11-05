@@ -1,0 +1,4 @@
+Content-Length: 243
+Content-Type: text/event-json
+
+{"Event-Name":"CHANNEL_PARK","Core-UUID":"6d0f1c2e-0000-4000-8000-000000000001","Unique-ID":"0192f6a1-7c3e-7b21-9a4d-5e6f70819203","variable_cc_role":"arrival","variable_switch_r_sdp":"v=0\r\no=- 1 2 IN IP4 127.0.0.1\r\n","nested":{"a":[1,2]}}

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- parity-telephony-controller's freeswitch (TC ADR 0002 §7): signalling only, every call in
+     bypass, ESL on loopback with TC its only client. vars.xml holds what differs per deployment;
+     compose/freeswitch-test/ overrides it for the tests. -->
+<document type="freeswitch/xml">
+  <X-PRE-PROCESS cmd="include" data="vars.xml"/>
+  <section name="configuration" description="Various Configuration">
+    <X-PRE-PROCESS cmd="include" data="autoload_configs/*.xml"/>
+  </section>
+  <section name="dialplan" description="Regex/XML Dialplan">
+    <X-PRE-PROCESS cmd="include" data="dialplan/*.xml"/>
+  </section>
+  <section name="directory" description="User Directory">
+    <X-PRE-PROCESS cmd="include" data="directory/*.xml"/>
+  </section>
+</document>

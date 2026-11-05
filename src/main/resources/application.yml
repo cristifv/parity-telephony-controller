@@ -1,0 +1,122 @@
+spring:
+  application:
+    name: parity-telephony-controller
+  main:
+    # JSON lines only on stdout.
+    banner-mode: off
+  lifecycle:
+    timeout-per-shutdown-phase: 15s
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  # The management port: /livez, /readyz, /metrics (PLAN.md "Security"). The telephony.v1 gRPC
+  # port is parity.telephony-controller.grpc.port (9700).
+  port: 9701
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health, prometheus
+      path-mapping:
+        prometheus: metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+        # /livez and /readyz on the same port.
+        add-additional-paths: true
+      group:
+        readiness:
+          include: readinessState, gate
+  metrics:
+    # The common labels of every series (PLAN.md "Observability").
+    tags:
+      service: ${spring.application.name}
+      zone: ${parity.telephony-controller.zone}
+      node: ${parity.telephony-controller.node-id}
+      instance: ${parity.telephony-controller.instance}
+      version: ${parity.telephony-controller.version}
+
+parity:
+  telephony-controller:
+    node-id: ${MEDIA_NODE_ID:media-1}
+    zone: ${ZONE:zone-1}
+    instance: ${HOSTNAME:local}
+    version: '@project.version@'
+    # A host directory, bind-mounted into the container, so that every controller on the
+    # host shares one lock file (PLAN.md R1-5).
+    lock-dir: /run/parity-telephony-controller
+    lifecycle:
+      healthy-file: /tmp/${spring.application.name}.healthy
+      drained-file: /tmp/${spring.application.name}.drained
+      # ARCH §7.3: within the grace period (15 s): deregistration delay, then the drain.
+      deregistration-delay: 2s
+      drain-timeout: 10s
+    readiness:
+      poll-interval: 250ms
+      connect-timeout: 500ms
+      # What must answer before the controller is healthy: the ESL subscription is checked by
+      # the node itself (step 3); parity-ms's TCP port until its hello (step 4).
+      endpoints:
+        parity-ms: 127.0.0.1:2223
+    # The zone's deployment bins: only their IE replicas are served (TC ADR 0001 §4.3).
+    bins: ${PARITY_BINS:bin-a}
+    grpc:
+      port: 9700
+      # Test only (the 'test' and 'fake' profiles): identity from x-parity-test-peer until mTLS.
+      test-peer-header: false
+    etcd:
+      # IE's owner records, read through etcd's /v3 JSON gateway (ADR R1-14). TLS with step 8.
+      endpoint: ${ETCD_ENDPOINT:http://127.0.0.1:2379}
+      timeout: 50ms
+    journal:
+      # The hangup journal, on a host volume (PLAN.md R1-3).
+      dir: /var/lib/parity-telephony-controller/journal
+    fake:
+      # Test only (the 'fake' profile). Loopback by default; inside a container, set 0.0.0.0.
+      control-host: 127.0.0.1
+      control-port: 9702
+    # The media node (TC ADR 0002): freeswitch over ESL, media through parity-ms.
+    node:
+      mode: real
+      esl:
+        host: 127.0.0.1
+        port: 8021
+        # The secret, mounted only into TC and freeswitch (the deploy role, step 8).
+        password-file: /run/secrets/freeswitch_esl_password
+        startup-timeout: 60s
+      max-legs: 5000
+      answer-timeout: 2s
+      claimed-backstop: 60s
+      # opensips, through which agent legs go (fs_path); empty: dialled directly.
+      agent-proxy: ''
+      # Agents registered with freeswitch itself (test setups): one domain, or a per-tenant template
+      # '{tenant}.agents.localhost' (quoted: YAML) whose first label is the leg's tenant (TC-056).
+      agent-registrar-domain: ''
+      trunks: {}
+      cdr-dir: /var/log/freeswitch/json_cdr
+      # freeswitch's RTP block: the canary (outside parity-ms's and the ephemeral ranges).
+      canary-low: 61000
+      canary-high: 61099
+      # Test only: refused at start outside the 'test' profile.
+      test-headers: false
+      media: parity-ms
+      # StartRecording's sink: none (refused) until R9's encrypted one. 'null' (quoted: YAML) records
+      # into parity-ms's null sink, which writes nothing; local, test and fake profiles only.
+      recording-sink: none
+      parity-ms:
+        host: 127.0.0.1
+        port: 2223
+        # One request's budget in all (slot, connect, answer). It decides no outcome: a parity-ms with
+        # play_async answers plays at once and TC's play saga (ADR 0004) settles them by events; a lost
+        # answer is retried with the same id or compensated. Only an older parity-ms (synchronous plays)
+        # needs the old order (--prompt-wait-ms < this < IE's 300 ms), which TC checks (MS-042).
+        timeout: 250ms
+        connections: 4
+        # The orphan sweep waits this long after every start or ESL reconnect (a full sync).
+        sweep-grace: 3m

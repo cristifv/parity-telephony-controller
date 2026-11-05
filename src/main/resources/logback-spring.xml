@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- parity-contracts' log-record.v1 on stdout, one JSON object per line, masked
+     (obs.JsonLogFormatter; CONVENTIONS "Logging"). Writing never blocks the caller: lines go
+     through a bounded queue that drops, counts and reports (log.dropped) when full; each record
+     gets its seq before the queue. -->
+<configuration>
+  <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="parity.telephonycontroller.obs.LogRecordEncoder"/>
+  </appender>
+  <appender name="ASYNC" class="parity.telephonycontroller.obs.CountingAsyncAppender">
+    <queueSize>8192</queueSize>
+    <discardingThreshold>0</discardingThreshold>
+    <neverBlock>true</neverBlock>
+    <maxFlushTime>2000</maxFlushTime>
+    <appender-ref ref="JSON"/>
+  </appender>
+  <root level="INFO">
+    <appender-ref ref="ASYNC"/>
+  </root>
+</configuration>

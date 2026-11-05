@@ -1,0 +1,11 @@
+<include>
+  <!-- The test overlay (compose and the real-node tests): mounted over freeswitch/conf/vars.xml. -->
+  <X-PRE-PROCESS cmd="set" data="esl_password=tc-test-esl"/>
+  <X-PRE-PROCESS cmd="set" data="sip_ip=127.0.0.1"/>
+  <!-- The scripts' leg ids come from X-Test-Leg-ID (never in production). -->
+  <X-PRE-PROCESS cmd="set" data="tc_test_headers=true"/>
+  <X-PRE-PROCESS cmd="set" data="carrier_session_timeout=1800"/>
+  <!-- Short, so the desk-phone timer test sees freeswitch's UPDATE refreshes within a minute. -->
+  <X-PRE-PROCESS cmd="set" data="deskphone_session_timeout=90"/>
+  <X-PRE-PROCESS cmd="set" data="json_cdr_dir=/tc-out/json_cdr"/>
+</include>
